@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <button onclick="loadIPs()">🔄 Refresh IP History</button>
+  <div id="ipList" style="margin-top: 20px;"></div>
+
+  <script>
+    const FIREBASE_URL = "https://realtimedatabase-8882b-default-rtdb.asia-southeast1.firebasedatabase.app/ipAddresses.json";
+
+    async function loadIPs() {
+      const ipList = document.getElementById("ipList");
+      try {
+        ipList.innerHTML = "Loading...";
+        
+        // Fetch all IPs from Firebase
+        const data = await fetch(FIREBASE_URL).then(res => res.json());
+        
+        // Convert object to array
+        const ips = data ? Object.values(data) : [];
+        
+        // Display as a list
+        ipList.innerHTML = ips.length > 0
+          ? `<h3>IP History (${ips.length})</h3>
+             <ul>
+               ${ips.map(entry => `
+                 <li>
+                   <strong>${entry.ip}</strong>
+                   <small>${new Date(entry.time).toLocaleString()}</small>
+                 </li>
+               `).join('')}
+             </ul>`
+          : "No IPs found yet.";
+      } catch (e) {
+        ipList.innerHTML = `🚨 Error: ${e.message}`;
+      }
+    }
+
+    // Load IPs on page open
+    loadIPs();
+  </script>
+</body>
+</html>
